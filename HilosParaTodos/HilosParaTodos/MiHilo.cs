@@ -4,11 +4,14 @@ public class MiHilo
 {
     Thread hilo;
     private string text;
+    Wrapper<Action> finishEvent;
     
-    public MiHilo(string text)
+    public MiHilo(string text, Wrapper<Action> finishEvent)
     {
         this.text = text;
-        MyEvents.finalizar += () => { Console.WriteLine($"Hilo {text}"); };
+        //Con global crea una copia !
+        this.finishEvent = finishEvent;
+        finishEvent.Value += () => { Console.WriteLine($"Hilo {text}"); };
         hilo = new Thread(_process);
     }
 
@@ -20,7 +23,7 @@ public class MiHilo
     void _process()
     {
         for (int i = 0; i < 1000; i++) Console.Write (text);
-        MyEvents.finalizar?.Invoke();
+        finishEvent.Value.Invoke();
         Console.WriteLine($"Ha terminado: {text}");
     }
 }
